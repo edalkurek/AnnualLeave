@@ -1,10 +1,26 @@
 package com.example.annualleavemodule.bean;
 
+import java.time.LocalDate;
+
 public class AnnualLeaveCreateRequest {
 
-  private Integer requestedDate;
+  private LocalDate startDate;
+  private LocalDate endDate;
 
-  public Integer getRequestedDate() {
-    return requestedDate;
+  public LocalDate getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(LocalDate startDate) {
+    this.startDate = startDate;
+  }
+
+  public LocalDate getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(LocalDate endDate) {
+    this.endDate = endDate;
   }
 }
+

@@ -1,6 +1,7 @@
 package com.example.annualleavemodule.service;
 
 import com.example.annualleavemodule.bean.MyUserDetails;
+import com.example.annualleavemodule.entity.Employee;
 import com.example.annualleavemodule.repository.IEmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    var employee = iEmployeeRepository.findEmployeeByEmail(email).orElse(null);
+    Employee employee = iEmployeeRepository.findEmployeeByEmail(email).orElse(null);
     if (employee == null) {
       throw new UsernameNotFoundException("Could not find user");
     }

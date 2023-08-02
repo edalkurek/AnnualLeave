@@ -1,22 +1,11 @@
 package com.example.annualleavemodule.entity;
 
+import com.example.annualleavemodule.enums.UserType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.time.LocalDate;
-import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "employee")
@@ -54,29 +43,22 @@ public class Employee {
   @ApiModelProperty(value="Annual Leave")
   private AnnualLeave annualLeave;
 
-  @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "users_roles",
-      joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
-
-  @ApiModelProperty(value="User Role")
-  private Set<UserRole> userRoles;
+  @Enumerated(EnumType.STRING)
+  private UserType userType;
 
   public Employee() {
 
   }
 
   public Employee(String name, String surname, String email, String password, LocalDate startedAt,
-                  AnnualLeave annualLeave, Set<UserRole> userRoles) {
+                  AnnualLeave annualLeave, UserType userType) {
     this.name = name;
     this.surname = surname;
     this.email = email;
     this.password = password;
     this.startedAt = startedAt;
     this.annualLeave = annualLeave;
-    this.userRoles = userRoles;
+    this.userType = userType;
   }
 
   public Long getId() {
@@ -131,11 +113,11 @@ public class Employee {
     this.annualLeave = annualLeave;
   }
 
-  public Set<UserRole> getUserRoles() {
-    return userRoles;
+  public UserType getUserType() {
+    return userType;
   }
 
-  public void setUserRoles(Set<UserRole> userRoles) {
-    this.userRoles = userRoles;
+  public void setUserType(UserType userType) {
+    this.userType = userType;
   }
 }

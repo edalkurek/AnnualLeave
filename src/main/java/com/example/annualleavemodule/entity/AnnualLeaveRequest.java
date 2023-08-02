@@ -32,7 +32,7 @@ public class AnnualLeaveRequest {
   @ApiModelProperty(value="Request Date")
   private Integer requestedDate;
 
-  @Column(name = "statu")
+  @Column(name = "status")
   @Enumerated(value = EnumType.STRING)
   @ApiModelProperty(value="Annual Leave Status")
   private AnnualLeaveStatus annualLeaveStatus;

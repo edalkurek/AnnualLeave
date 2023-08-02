@@ -3,7 +3,6 @@ package com.example.annualleavemodule.config;
 import com.example.annualleavemodule.repository.IAnnualLeaveRepository;
 import com.example.annualleavemodule.repository.IAnnualLeaveRequestRepository;
 import com.example.annualleavemodule.repository.IEmployeeRepository;
-import com.example.annualleavemodule.repository.IUserRoleRepository;
 import com.example.annualleavemodule.service.AnnualLeaveServiceImpl;
 import com.example.annualleavemodule.service.EmployeeServiceImpl;
 import com.example.annualleavemodule.service.IAnnualLeaveService;
@@ -15,9 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class AnnualLeaveAppConfig {
 
   @Bean
-  public IEmployeeService iEmployeeService(IEmployeeRepository iEmployeeRepository,
-                                           IUserRoleRepository iUserRoleRepository) {
-    return new EmployeeServiceImpl(iEmployeeRepository, iUserRoleRepository);
+  public IEmployeeService iEmployeeService(IEmployeeRepository iEmployeeRepository) {
+    return new EmployeeServiceImpl(iEmployeeRepository);
   }
 
   @Bean

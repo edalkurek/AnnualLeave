@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface IEmployeeRepository extends JpaRepository<Employee, Long> {
 
-  @Query("select e from Employee e where e.email = :email")
+  @Query("select email from Employee e where e.email = :email")
   Optional<Employee> findEmployeeByEmail(String email);
 }

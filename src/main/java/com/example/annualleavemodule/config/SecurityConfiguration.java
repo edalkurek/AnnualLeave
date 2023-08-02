@@ -48,9 +48,11 @@ public class SecurityConfiguration {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
       http
+          .csrf().disable()
           .authorizeRequests()
           .antMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN")
           .antMatchers("/api/user/{employeeId}/leave-request").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+          .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**", "/h2-console/**", "/h2menu/**", "/h2query/**").permitAll()
           .anyRequest().authenticated()
           .and()
           .formLogin().permitAll()
@@ -61,7 +63,7 @@ public class SecurityConfiguration {
       ;
     }
 
-    //Uygulamanın frotend arayüzü olmadığından swagger ve postman'in kullanılabilir olması için ignore "/**" şeklinde bırakılmıştır.
+    //swagger kontrolü için ignore edildi
     @Override
     public void configure(WebSecurity web) {
       web.ignoring().antMatchers("/**");

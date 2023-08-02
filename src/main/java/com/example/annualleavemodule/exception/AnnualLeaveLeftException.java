@@ -1,10 +1,20 @@
 package com.example.annualleavemodule.exception;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class AnnualLeaveLeftException extends Exception {
 
-  private final static String DEFAULT_MESSAGE = "You are not entitled to annual leave within the requested period: ";
-
   public AnnualLeaveLeftException(Integer requestedDate) {
-    super(String.format("%s%d", DEFAULT_MESSAGE, requestedDate));
+    super(getLocalizedErrorMessage(requestedDate));
+  }
+
+  private static String getLocalizedErrorMessage(Integer requestedDate) {
+    Locale locale = Locale.getDefault();
+    ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
+
+    String message = messages.getString("annual.leave.left");
+    return MessageFormat.format(message, requestedDate);
   }
 }

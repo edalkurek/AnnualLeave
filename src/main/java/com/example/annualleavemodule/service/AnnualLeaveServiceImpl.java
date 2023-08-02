@@ -6,11 +6,19 @@ import com.example.annualleavemodule.entity.AnnualLeaveRequest;
 import com.example.annualleavemodule.exception.AnnualLeaveLeftException;
 import com.example.annualleavemodule.repository.IAnnualLeaveRepository;
 import com.example.annualleavemodule.repository.IAnnualLeaveRequestRepository;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.annualleavemodule.enums.AnnualLeaveStatus.PENDING;
 
+@Service
 public class AnnualLeaveServiceImpl implements IAnnualLeaveService {
 
   private final IAnnualLeaveRequestRepository iAnnualLeaveRequestRepository;
@@ -25,15 +33,21 @@ public class AnnualLeaveServiceImpl implements IAnnualLeaveService {
 
   @Override
   public AnnualLeaveCreateResponse createAnnualLeaveRequest(AnnualLeaveCreateRequest annualLeaveCreateRequest,
-                                                            Long employeeId)
-      throws AnnualLeaveLeftException {
-    var requestedDate = annualLeaveCreateRequest.getRequestedDate();
-    if (isRequestedDateValid(requestedDate, employeeId)) {
-      var annualLeaveRequest = new AnnualLeaveRequest(employeeId, requestedDate, PENDING);
-      return new AnnualLeaveCreateResponse(iAnnualLeaveRequestRepository.save(annualLeaveRequest).getId());
-    } else {
-      throw new AnnualLeaveLeftException(requestedDate);
+                                                            Long employeeId) throws AnnualLeaveLeftException {
+    LocalDate startDate = annualLeaveCreateRequest.getStartDate();
+    LocalDate endDate = annualLeaveCreateRequest.getEndDate();
+
+    int annualLeaveDays = calculateAnnualLeaveDays(startDate, endDate);
+
+    if (!isRequestedDateValid(annualLeaveDays, employeeId)) {
+      throw new AnnualLeaveLeftException(annualLeaveDays);
     }
+
+    AnnualLeaveRequest annualLeaveRequest = new AnnualLeaveRequest(employeeId, annualLeaveDays, PENDING);
+    iAnnualLeaveRequestRepository.save(annualLeaveRequest);
+
+    // Return the annual leave request ID
+    return new AnnualLeaveCreateResponse(annualLeaveRequest.getId());
   }
 
   @Override
@@ -45,9 +59,9 @@ public class AnnualLeaveServiceImpl implements IAnnualLeaveService {
   @Transactional
   public void approveAnnualLeaveRequest(Long annualLeaveRequestId) {
     iAnnualLeaveRequestRepository.approveAnnualLeaveRequest(annualLeaveRequestId);
-    var annualLeave = iAnnualLeaveRequestRepository.findById(annualLeaveRequestId)
+    AnnualLeaveRequest annualLeave = iAnnualLeaveRequestRepository.findById(annualLeaveRequestId)
                                                    .orElse(null);
-    var annualLeaveLeft = getAnnualLeaveLeft(annualLeave.getEmployeeId(), annualLeave.getRequestedDate());
+    Integer annualLeaveLeft = getAnnualLeaveLeft(annualLeave.getEmployeeId(), annualLeave.getRequestedDate());
 
     iAnnualLeaveRepository.updateAnnualLeave(annualLeave.getEmployeeId(), annualLeaveLeft);
   }
@@ -59,14 +73,25 @@ public class AnnualLeaveServiceImpl implements IAnnualLeaveService {
   }
 
   private boolean isRequestedDateValid(Integer requestedDate, Long employeeId) {
-    if (requestedDate <= iAnnualLeaveRepository.getAnnualLeaveLeft(employeeId)) {
-      return true;
-    } else {
-      return false;
-    }
+    return requestedDate <= iAnnualLeaveRepository.getAnnualLeaveLeft(employeeId);
   }
 
   private Integer getAnnualLeaveLeft(Long employeeId, Integer requestedDate) {
     return iAnnualLeaveRepository.getAnnualLeaveLeft(employeeId) - requestedDate;
   }
+
+  private int calculateAnnualLeaveDays(LocalDate startDate, LocalDate endDate) {
+    int workingDays = 0;
+    LocalDate currentDate = startDate;
+
+    while (!currentDate.isAfter(endDate)) {
+      if (currentDate.getDayOfWeek() != DayOfWeek.SATURDAY && currentDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+        workingDays++;
+      }
+      currentDate = currentDate.plusDays(1);
+    }
+
+    return workingDays;
+  }
+
 }

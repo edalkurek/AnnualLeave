@@ -1,10 +1,21 @@
 package com.example.annualleavemodule.exception;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class EmployeeCreatedBeforeException extends Exception {
 
-  private static final String DEFAULT_MESSAGE = "Employee created before with unique email: ";
-
   public EmployeeCreatedBeforeException(String email) {
-    super(String.format("%s%s", DEFAULT_MESSAGE, email));
+    super(getLocalizedErrorMessage(email));
+  }
+
+  private static String getLocalizedErrorMessage(String email) {
+    Locale locale = Locale.getDefault();
+    ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
+
+    String message = messages.getString("employee.created.before");
+    return MessageFormat.format(message, email);
   }
 }
+
